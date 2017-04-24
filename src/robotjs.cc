@@ -671,6 +671,25 @@ NAN_METHOD(getScreenSize)
 	info.GetReturnValue().Set(obj);
 }
 
+NAN_METHOD(getWindowRect)
+{
+	if (info.Length() != 1)
+	{
+		return Nan::ThrowError("Invalid number of arguments.");
+	}
+
+	size_t windowID = info[0]->Int32Value();
+
+	MMRect rect = getWindowRect(windowID);
+
+	Local<Object> obj = Nan::New<Object>();
+	Nan::Set(obj, Nan::New("x").ToLocalChecked(), Nan::New<Number>(rect.origin.x));
+	Nan::Set(obj, Nan::New("y").ToLocalChecked(), Nan::New<Number>(rect.origin.y));
+	Nan::Set(obj, Nan::New("width").ToLocalChecked(), Nan::New<Number>(rect.size.width));
+	Nan::Set(obj, Nan::New("height").ToLocalChecked(), Nan::New<Number>(rect.size.height));
+	info.GetReturnValue().Set(obj);
+}
+
 NAN_METHOD(getXDisplayName)
 {
 	#if defined(USE_X11)
@@ -858,6 +877,9 @@ NAN_MODULE_INIT(InitAll)
 
 	Nan::Set(target, Nan::New("getScreenSize").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(getScreenSize)).ToLocalChecked());
+
+	Nan::Set(target, Nan::New("getWindowRect").ToLocalChecked(),
+		Nan::GetFunction(Nan::New<FunctionTemplate>(getWindowRect)).ToLocalChecked());
 
 	Nan::Set(target, Nan::New("captureScreen").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(captureScreen)).ToLocalChecked());

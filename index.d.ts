@@ -27,5 +27,6 @@ export function scrollMouse(magnitude: number, direction: string) : void
 export function getMousePos(): { x: number, y: number }
 export function getPixelColor(x: number, y: number): string
 export function getScreenSize(): { width: number, height: number }
+export function getWindowRect(windowID: number): { x: number, y: number, width: number, height: number }
 
 export var screen: Screen
