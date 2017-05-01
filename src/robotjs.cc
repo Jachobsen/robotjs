@@ -8,6 +8,7 @@
 #include "screen.h"
 #include "screengrab.h"
 #include "MMBitmap.h"
+#include "window.h"
 #include "snprintf.h"
 #include "microsleep.h"
 #if defined(USE_X11)
@@ -247,7 +248,7 @@ NAN_METHOD(scrollMouse)
 	{
     	return Nan::ThrowError("Invalid number of arguments.");
 	}
-	
+
 	int x = info[0]->Int32Value();
 	int y = info[1]->Int32Value();
 
@@ -758,6 +759,49 @@ NAN_METHOD(captureScreen)
 }
 
 /*
+Window
+*/
+
+NAN_METHOD(getWindowList)
+{
+	if (info.Length() != 0)
+	{
+		return Nan::ThrowError("Invalid number of arguments.");
+	}
+
+	std::vector<MMWindow> windowList = getWindowList();
+	Local<Array> arr = Nan::New<Array>();
+
+	for (std::vector<MMWindow>::size_type i = 0; i < windowList.size(); i++)
+	{
+        MMWindow win = windowList[i];
+
+        if (win.name == NULL)
+        {
+            continue;
+        }
+
+  		Local<Object> obj = Nan::New<Object>();
+  		Nan::Set(obj, Nan::New("pid").ToLocalChecked(), Nan::New<Number>((int)win.pid));
+  		Nan::Set(obj, Nan::New("number").ToLocalChecked(), Nan::New<Number>((int)win.number));
+  		Nan::Set(obj, Nan::New("name").ToLocalChecked(), Nan::New<String>(win.name).ToLocalChecked());
+  		Nan::Set(obj, Nan::New("ownerIsFocused").ToLocalChecked(), Nan::New<v8::Boolean>(win.ownerIsFocused));
+
+  		Local<Object> rect = Nan::New<Object>();
+		Nan::Set(rect, Nan::New("x").ToLocalChecked(), Nan::New<Number>((int)win.bounds.origin.x));
+		Nan::Set(rect, Nan::New("y").ToLocalChecked(), Nan::New<Number>((int)win.bounds.origin.y));
+		Nan::Set(rect, Nan::New("width").ToLocalChecked(), Nan::New<Number>((int)win.bounds.size.width));
+		Nan::Set(rect, Nan::New("height").ToLocalChecked(), Nan::New<Number>((int)win.bounds.size.height));
+
+		Nan::Set(obj, Nan::New("bounds").ToLocalChecked(), rect);
+
+  		Nan::Set(arr, i, obj);
+    }
+
+    info.GetReturnValue().Set(arr);
+}
+
+/*
  ____  _ _
 | __ )(_) |_ _ __ ___   __ _ _ __
 |  _ \| | __| '_ ` _ \ / _` | '_ \
@@ -892,6 +936,9 @@ NAN_MODULE_INIT(InitAll)
 
 	Nan::Set(target, Nan::New("setXDisplayName").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(setXDisplayName)).ToLocalChecked());
+
+	Nan::Set(target, Nan::New("getWindowList").ToLocalChecked(),
+		Nan::GetFunction(Nan::New<FunctionTemplate>(getWindowList)).ToLocalChecked());
 }
 
 NODE_MODULE(robotjs, InitAll)

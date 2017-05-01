@@ -53,6 +53,14 @@ H_INLINE MMRect MMRectMake(size_t x, size_t y, size_t width, size_t height)
 	return rect;
 }
 
+struct MMWindow {
+    size_t pid;
+    size_t number;
+    const char* name;
+    MMRect bounds;
+    unsigned ownerIsFocused;
+};
+
 #define MMPointZero MMPointMake(0, 0)
 
 #if defined(IS_MACOSX)
