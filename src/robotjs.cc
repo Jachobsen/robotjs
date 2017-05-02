@@ -5,6 +5,7 @@
 #include "mouse.h"
 #include "deadbeef_rand.h"
 #include "keypress.h"
+#include "process.h"
 #include "screen.h"
 #include "screengrab.h"
 #include "MMBitmap.h"
@@ -802,6 +803,20 @@ NAN_METHOD(getWindowList)
 }
 
 /*
+Process
+*/
+
+NAN_METHOD(getFocusedProcess)
+{
+	if (info.Length() != 0)
+	{
+		return Nan::ThrowError("Invalid number of arguments.");
+	}
+
+    info.GetReturnValue().Set(Nan::New<Number>(getFocusedProcess()));
+}
+
+/*
  ____  _ _
 | __ )(_) |_ _ __ ___   __ _ _ __
 |  _ \| | __| '_ ` _ \ / _` | '_ \
@@ -939,6 +954,9 @@ NAN_MODULE_INIT(InitAll)
 
 	Nan::Set(target, Nan::New("getWindowList").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(getWindowList)).ToLocalChecked());
+
+	Nan::Set(target, Nan::New("getFocusedProcess").ToLocalChecked(),
+		Nan::GetFunction(Nan::New<FunctionTemplate>(getFocusedProcess)).ToLocalChecked());
 }
 
 NODE_MODULE(robotjs, InitAll)

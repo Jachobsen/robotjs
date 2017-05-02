@@ -57,6 +57,7 @@
       'src/mouse.c',
       'src/keypress.c',
       'src/keycode.c',
+      'src/process.c',
       'src/screen.c',
       'src/screengrab.c',
       'src/snprintf.c',

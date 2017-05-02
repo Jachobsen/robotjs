@@ -1,25 +1,13 @@
 #include "window.h"
 #include "os.h"
+#include "process.h"
 
 #if defined(IS_MACOSX)
-    #include <ApplicationServices/ApplicationServices.h>
     #include <QuartzCore/QuartzCore.h>
 #endif
 
-pid_t getFocusedProcessID() {
-    #if defined(IS_MACOSX)
-        ProcessSerialNumber processSerialNumber;
-        GetFrontProcess(&processSerialNumber);
-        pid_t frontProcessID;
-        GetProcessPID(&processSerialNumber, &frontProcessID);
-        return frontProcessID;
-    #endif
-
-    return 0;
-}
-
 std::vector<MMWindow> getWindowList() {
-    pid_t focusedPID = getFocusedProcessID();
+    int focusedPID = getFocusedProcess();
 
     CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionAll, kCGNullWindowID);
     CFIndex windowCount = CFArrayGetCount(windowList);
@@ -41,7 +29,7 @@ std::vector<MMWindow> getWindowList() {
         CGRect windowBounds;
         CGRectMakeWithDictionaryRepresentation(windowBoundsRef, &windowBounds);
         window.bounds = MMRectMake(windowBounds.origin.x, windowBounds.origin.y, windowBounds.size.width, windowBounds.size.height);
-        window.ownerIsFocused = (pid_t)window.pid == focusedPID;
+        window.ownerIsFocused = (int)window.pid == focusedPID;
 
         retVal.push_back(window);
     }
